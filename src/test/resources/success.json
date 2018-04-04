@@ -1,0 +1,33 @@
+{
+  "request": {
+    "method": "POST",
+    "uri": "/huluwa",
+    "headers": {
+      "Accept-encoding": [
+        "gzip,deflate"
+      ],
+      "X-real-ip": [
+        "113.116.24.124"
+      ],
+      "Connection": [
+        "close"
+      ],
+      "Host": [
+        "dhs.mingshz.com"
+      ],
+      "User-agent": [
+        "Apache-HttpClient/4.3 (java 1.5)"
+      ],
+      "Content-type": [
+        "application/json;charset=UTF-8"
+      ],
+      "X-forwarded-for": [
+        "113.116.24.124"
+      ],
+      "Content-length": [
+        "269"
+      ]
+    },
+    "content": "{\"returnCode\":\"0\",\"resultCode\":\"0\",\"sign\":\"0D77260D1D799718A5DE44CB904B86D6\",\"outChannelNo\":\"2018040400101000000038\",\"status\":\"02\",\"mchId\":\"000000010000000001\",\"channel\":\"gateway\",\"body\":\"测试的商品\",\"outTradeNo\":\"0aab2\",\"amount\":1.01,\"transTime\":\"20180404215801\"}"
+  }
+}
