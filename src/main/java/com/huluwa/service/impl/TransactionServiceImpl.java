@@ -56,7 +56,7 @@ public class TransactionServiceImpl implements TransactionService {
         //交易方式
         transactionEntity.setChannel(r.getChannel());
         //异步回调地址
-        transactionEntity.setNotifyUrl(r.getURLprefix() + "/huluwa/transfer");
+        transactionEntity.setNotifyUrl(r.getURLPrefix() + "/huluwa/transfer");
 
         //转成json
         String s = objectMapper.writeValueAsString(transactionEntity);

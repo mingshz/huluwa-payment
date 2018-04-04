@@ -51,7 +51,7 @@ public class RequestMessage {
     /**
      * 回调地址前缀
      */
-    private String URLprefix;
+    private String URLPrefix;
 
 
 }
