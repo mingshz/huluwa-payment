@@ -1,7 +1,7 @@
 package com.huluwa.service;
 
 
-import com.huluwa.config.ServiceConfig;
+import com.huluwa.config.PaymentSpringConfig;
 import com.huluwa.model.RequestMessage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 @WebAppConfiguration
-@ContextConfiguration(classes = ServiceConfig.class)
+@ContextConfiguration(classes = PaymentSpringConfig.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TransactionServiceTest {
 
@@ -42,8 +42,7 @@ public class TransactionServiceTest {
         rm.setKey("55be454630e847d7815c2c2d3bc59c0d");
         rm.setMchId("000000010000000001");
         //随便写的
-        rm.setURLprefix("http://www.baidu.com");
-        rm.setSettleCycle(0);
+        rm.setURLPrefix("http://www.baidu.com");
         rm.setOutTradeNo("0010");
         //测试时只接受网关
         rm.setChannel("gateway");
@@ -59,8 +58,7 @@ public class TransactionServiceTest {
         rm.setKey("55be454630e847d7815c2c2d3bc59c0d");
         rm.setMchId("000000010000000001");
         //随便写的
-        rm.setURLprefix("http://dhs.mingshz.com/huluwa");
-        rm.setSettleCycle(0);
+        rm.setURLPrefix("http://dhs.mingshz.com/huluwa");
         rm.setOutTradeNo("0a122112");
         //测试时只接受网关
         rm.setChannel("gateway");

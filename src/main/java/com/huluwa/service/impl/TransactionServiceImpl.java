@@ -20,14 +20,18 @@ import java.util.Map;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    DateTimeFormatter fotmatterYear = DateTimeFormatter.ofPattern("yyyyMMdd");
     ObjectMapper objectMapper = new ObjectMapper();
 
     private final String sendUrl;
+    private final String key;
+    private final String mchId;
+    private final String URLPrefix;
 
     public TransactionServiceImpl(Environment environment) {
         this.sendUrl = environment.getProperty("huluwa.transferUrl", "http://pay-wx.join51.com/oft/acquirePlatform/api/transfer.html");
+        this.key = environment.getProperty("huluwa.Mkey", "55be454630e847d7815c2c2d3bc59c0d");
+        this.mchId = environment.getProperty("huluwa.mchId", "000000010000000001");
+        this.URLPrefix = environment.getProperty("huluwa.URLPrefix","http://dhs.mingshz.com/huluwa");
     }
 
     private static Log log = LogFactory.getLog(TransactionServiceImpl.class);
@@ -61,13 +65,13 @@ public class TransactionServiceImpl implements TransactionService {
         transactionEntity.setMchId(r.getMchId());
         //交易方式
         transactionEntity.setChannel(r.getChannel());
-        //异步回调地址   + "/huluwa/transfer"
-        transactionEntity.setNotifyUrl(r.getURLprefix());
+        //异步回调地址
+        transactionEntity.setNotifyUrl(r.getURLPrefix() + "/huluwa/transfer");
 
         //转成json
         String s = objectMapper.writeValueAsString(transactionEntity);
         //转成map
-        Map<String, String> map = objectMapper.readValue(s, Map.class);
+        Map map = objectMapper.readValue(s, Map.class);
 
         //调用demo中的拼接字符串方法
         String toSign = SignUtil.createLinkString(map);
@@ -84,10 +88,6 @@ public class TransactionServiceImpl implements TransactionService {
         String returnCode = (String)returnMap.get("returnCode");
         if (returnCode.equals("1")) {
             throw new PlaceOrderFailedException("请求失败:"+returnStr);
-        }
-        // 验签
-        if (!SignUtil.validSign(returnMap, key)) {
-            throw new PlaceOrderFailedException("验签错误");
         }
         String resultCode = (String)returnMap.get("resultCode");
         if (resultCode.equals("0")) {
@@ -109,6 +109,19 @@ public class TransactionServiceImpl implements TransactionService {
         } else {
             throw new PlaceOrderFailedException("业务结果状态:失败");
         }
+    }
+
+    @Override
+    public String htmlPay(String outTradeNo, String body, BigDecimal amount) throws PlaceOrderFailedException, IOException {
+        RequestMessage requestMessage = new RequestMessage();
+        requestMessage.setChannel("gateway");
+        requestMessage.setOutTradeNo(outTradeNo);
+        requestMessage.setBody(body);
+        requestMessage.setAmount(amount);
+        requestMessage.setMchId(mchId);
+        requestMessage.setKey(key);
+        requestMessage.setURLPrefix(URLPrefix);
+        return transaction(requestMessage);
     }
 
 }

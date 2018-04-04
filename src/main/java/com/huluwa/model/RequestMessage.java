@@ -43,15 +43,11 @@ public class RequestMessage {
      * 单位为元，小数两位
      */
     private BigDecimal amount;
-    /**
-     * 结算周期,0(D0)1(T1)默认结算周期是T1
-     */
-    private int settleCycle;
 
     /**
      * 回调地址前缀
      */
-    private String URLprefix;
+    private String URLPrefix;
 
 
 }

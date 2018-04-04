@@ -2,8 +2,6 @@ package com.huluwa.util;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.codec.binary.Hex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -22,7 +20,6 @@ import java.util.Map;
 
 public class SignUtil {
 	
-    private static Logger logger = LoggerFactory.getLogger(SignUtil.class);
 
 	public static JSONObject paraFilter(JSONObject sArray) {
 		JSONObject result = new JSONObject();
@@ -112,7 +109,6 @@ public class SignUtil {
         String sign = genSign(key, signPlainText);
         boolean isValid = sign.equals(oldSign);
         if (!isValid) {
-            logger.info("验证签名-签名明文：{}，md5签名：{}，待验证md5签名：{}", new String[] {signPlainText, sign, oldSign});
         }
         return isValid;
     }
@@ -124,7 +120,6 @@ public class SignUtil {
         boolean isValid = sign.equals(oldSign);
         System.out.println(isValid);
         if (!isValid) {
-            logger.info("验证签名-签名明文：{}，md5签名：{}，待验证md5签名：{}", new String[] {signPlainText, sign, oldSign});
         }
         return isValid;
     }
