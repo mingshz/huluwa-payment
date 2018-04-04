@@ -13,6 +13,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
@@ -38,6 +39,11 @@ public class TransactionServiceImpl implements TransactionService {
      * @throws IOException
      */
     public String transaction(RequestMessage r) throws IOException {
+        BigDecimal amount = r.getAmount();
+        double v = amount.doubleValue();
+        if(v < 1.0){
+            throw new PlaceOrderFailedException("请求失败:金额最小1元");
+        }
         //商户密钥
         String key = r.getKey();
         TransactionEntity transactionEntity = new TransactionEntity();
@@ -55,8 +61,8 @@ public class TransactionServiceImpl implements TransactionService {
         transactionEntity.setMchId(r.getMchId());
         //交易方式
         transactionEntity.setChannel(r.getChannel());
-        //异步回调地址
-        transactionEntity.setNotifyUrl(r.getURLprefix() + "/huluwa/transfer");
+        //异步回调地址   + "/huluwa/transfer"
+        transactionEntity.setNotifyUrl(r.getURLprefix());
 
         //转成json
         String s = objectMapper.writeValueAsString(transactionEntity);
@@ -94,7 +100,6 @@ public class TransactionServiceImpl implements TransactionService {
                 return payCode;
             } else if ("04".equals(payCodeWay)) {// JSON
                 return payCode;
-
             } else if ("03".equals(payCodeWay)) {// form
                 throw new PlaceOrderFailedException("意外的支付方式");
             } else if ("05".equals(payCodeWay)) {

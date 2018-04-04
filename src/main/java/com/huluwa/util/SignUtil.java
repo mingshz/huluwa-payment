@@ -122,6 +122,7 @@ public class SignUtil {
         String signPlainText = createLinkString(map);
         String sign = genSign(key, signPlainText);
         boolean isValid = sign.equals(oldSign);
+        System.out.println(isValid);
         if (!isValid) {
             logger.info("验证签名-签名明文：{}，md5签名：{}，待验证md5签名：{}", new String[] {signPlainText, sign, oldSign});
         }
