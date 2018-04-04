@@ -2,8 +2,8 @@ package com.huluwa.controller;
 
 import com.huluwa.event.CallbackFail;
 import com.huluwa.event.CallbackSuccess;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.huluwa.util.SignUtil;
+import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
@@ -17,9 +17,8 @@ import java.util.Map;
  * 回调处理控制器
  */
 @Controller
+@CommonsLog
 public class CallbackController {
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -27,7 +26,9 @@ public class CallbackController {
     @RequestMapping("/huluwa/transfer")
     @ResponseBody
     public String transferResult(HttpServletRequest request){
-        logger.info("callback参数:{}", request.getParameterMap());
+        log.debug("callback参数:"+request.getParameterMap());
+        // 验签
+//        !SignUtil.validSign(returnMap, key)
         //解析返回串
         Map<String, String[]> returnMap = request.getParameterMap();
         //获取通信Code
@@ -65,7 +66,7 @@ public class CallbackController {
         String[] errCodeDes = returnMap.get("errCodeDes");
         if(errCodeDes != null) {
             String errCodeDe = errCodeDes[0];
-            logger.error(errCodeDe);
+            log.error(errCodeDe);
         }
         return "FAIL";
     }
