@@ -53,13 +53,13 @@ public class TransactionServiceTest {
     public void goGoGo() throws IOException {
         //写一个下单请求 ,以商户身份
         RequestMessage rm = new RequestMessage();
-        rm.setAmount(new BigDecimal("2"));
+        rm.setAmount(new BigDecimal("1"));
         rm.setBody("测试的商品");
         rm.setKey("55be454630e847d7815c2c2d3bc59c0d");
         rm.setMchId("000000010000000001");
         //随便写的
         rm.setURLPrefix("http://dhs.mingshz.com/huluwa");
-        rm.setOutTradeNo("0a122112");
+        rm.setOutTradeNo("0a10s211");
         //测试时只接受网关
         rm.setChannel("gateway");
         String transaction = transactionService.transaction(rm);

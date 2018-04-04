@@ -7,17 +7,17 @@ import com.huluwa.model.RequestMessage;
 import com.huluwa.service.TransactionService;
 import com.huluwa.util.HttpsClientUtil;
 import com.huluwa.util.SignUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @Service
+@CommonsLog
 public class TransactionServiceImpl implements TransactionService {
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -27,14 +27,13 @@ public class TransactionServiceImpl implements TransactionService {
     private final String mchId;
     private final String URLPrefix;
 
+    @Autowired
     public TransactionServiceImpl(Environment environment) {
         this.sendUrl = environment.getProperty("huluwa.transferUrl", "http://pay-wx.join51.com/oft/acquirePlatform/api/transfer.html");
         this.key = environment.getProperty("huluwa.Mkey", "55be454630e847d7815c2c2d3bc59c0d");
         this.mchId = environment.getProperty("huluwa.mchId", "000000010000000001");
         this.URLPrefix = environment.getProperty("huluwa.URLPrefix","http://dhs.mingshz.com/huluwa");
     }
-
-    private static Log log = LogFactory.getLog(TransactionServiceImpl.class);
 
     /**
      * 下单请求

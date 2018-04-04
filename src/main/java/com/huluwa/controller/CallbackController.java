@@ -29,6 +29,7 @@ public class CallbackController {
 
     private final String key;
 
+    @Autowired
     public CallbackController(Environment environment) {
         this.key = environment.getProperty("huluwa.Mkey", "55be454630e847d7815c2c2d3bc59c0d");
     }
