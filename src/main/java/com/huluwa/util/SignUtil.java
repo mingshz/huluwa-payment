@@ -113,12 +113,11 @@ public class SignUtil {
         return isValid;
     }
 
-    public static boolean validSign(Map<String,String> map, String key) {
-        String oldSign = map.get("sign");
+    public static boolean validSign(Map<String,Object> map, String key){
+        Object oldSign = map.get("sign");
         String signPlainText = createLinkString(map);
         String sign = genSign(key, signPlainText);
         boolean isValid = sign.equals(oldSign);
-        System.out.println(isValid);
         if (!isValid) {
         }
         return isValid;

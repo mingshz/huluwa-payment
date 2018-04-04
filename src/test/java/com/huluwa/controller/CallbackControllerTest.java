@@ -47,7 +47,7 @@ public class CallbackControllerTest extends SpringWebTest {
         JsonNode requestEntity = infoEntity.get("request");
 
         mockMvc.perform(post("/huluwa/transfer")
-                .contentType(requestEntity.get("headers").get("Content-type").asText())
+                .contentType(requestEntity.get("headers").get("Content-type").get(0).asText())
                 .content(requestEntity.get("content").asText())
         )
                 .andDo(print())
