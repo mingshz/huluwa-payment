@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author CJ
  */
-@ContextConfiguration(classes = PaymentSpringConfig.class)
+@ContextConfiguration(classes = {PaymentSpringConfig.class,CallbackControllerTest.Config.class})
 @WebAppConfiguration
 public class CallbackControllerTest extends SpringWebTest {
 
