@@ -2,8 +2,8 @@ package com.huluwa.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.huluwa.event.CallbackFail;
-import com.huluwa.event.CallbackSuccess;
+import com.huluwa.event.OrderPayFailedEvent;
+import com.huluwa.event.OrderPaySuccessEvent;
 import com.huluwa.exception.AttestationException;
 import com.huluwa.util.SignUtil;
 import lombok.extern.apachecommons.CommonsLog;
@@ -65,11 +65,11 @@ public class CallbackController {
         if("01".equals(status)){
             //目前不需要
         }else if("02".equals(status)){
-            applicationEventPublisher.publishEvent(new CallbackSuccess(outTradeNo));
+            applicationEventPublisher.publishEvent(new OrderPaySuccessEvent(outTradeNo));
         }else if("05".equals(status)){
             //目前不需要
         }else if("09".equals(status)){
-            applicationEventPublisher.publishEvent(new CallbackFail(outTradeNo));
+            applicationEventPublisher.publishEvent(new OrderPayFailedEvent(outTradeNo));
         }
         return "SUCCESS";
     }

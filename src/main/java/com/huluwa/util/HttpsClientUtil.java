@@ -1,6 +1,5 @@
 package com.huluwa.util;
 
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -50,6 +49,7 @@ public class HttpsClientUtil {
         //指定信任密钥存储对象和连接套接字工厂
         try {
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+//            org.apache.http.ssl.SSLContexts.custom().useProtocol("TLS").loadTrustMaterial(trustStore, new AnyTrustStrategy()).build();
             SSLContext sslContext = SSLContexts.custom().useTLS().loadTrustMaterial(trustStore, new AnyTrustStrategy()).build();
             LayeredConnectionSocketFactory sslSF = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
             registryBuilder.register("https", sslSF);
@@ -147,8 +147,4 @@ public class HttpsClientUtil {
         }
 
     }
-    
-    public static void main(String[] args) {
-	}
-    
 }

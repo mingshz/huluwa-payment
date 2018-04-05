@@ -5,13 +5,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 回调,下单失败事件
+ * 订单支付成功
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class CallbackSuccess extends PaymentOrderEvent{
+public class OrderPaySuccessEvent extends PaymentOrderEvent{
 
-    public CallbackSuccess(String orderId){
+    public OrderPaySuccessEvent(String orderId){
         super(orderId);
     }
     private String message;

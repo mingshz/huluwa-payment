@@ -3,7 +3,7 @@ package com.huluwa.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huluwa.config.PaymentSpringConfig;
-import com.huluwa.event.CallbackSuccess;
+import com.huluwa.event.OrderPaySuccessEvent;
 import me.jiangcai.lib.test.SpringWebTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,13 +23,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class CallbackControllerTest extends SpringWebTest {
 
-    static CallbackSuccess lastEvent = null;
+    static OrderPaySuccessEvent lastEvent = null;
 
     ///
     @Configuration
     public static class Config {
-        @EventListener(CallbackSuccess.class)
-        public void getIt(CallbackSuccess event) {
+        @EventListener(OrderPaySuccessEvent.class)
+        public void getIt(OrderPaySuccessEvent event) {
             lastEvent = event;
         }
     }
