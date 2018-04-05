@@ -46,11 +46,11 @@ public class CallbackControllerTest extends SpringWebTest {
         JsonNode infoEntity = mapper.readTree(new ClassPathResource("/success_with_" + orderId + ".json").getFile());
         JsonNode requestEntity = infoEntity.get("request");
 
-        mockMvc.perform(post("/huluwa/transfer")
+        mockMvc.perform(post("/huluwa/transfer/000000010000000001")
                 .contentType(requestEntity.get("headers").get("Content-type").get(0).asText())
                 .content(requestEntity.get("content").asText())
         )
-                .andDo(print())
+//                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("SUCCESS"))
         ;

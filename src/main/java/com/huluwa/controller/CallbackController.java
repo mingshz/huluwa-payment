@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -33,27 +35,28 @@ public class CallbackController {
         this.key = environment.getProperty("huluwa.Mkey", "55be454630e847d7815c2c2d3bc59c0d");
     }
 
-    @RequestMapping("/huluwa/transfer")
+    @RequestMapping(value = "/huluwa/transfer/{merchantId}", method = RequestMethod.POST)
     @ResponseBody
-    public String transferResult(@RequestBody String request) throws DecoderException {
-        log.debug("callback参数:"+request);
+    public String transferResult(@PathVariable("merchantId") String merchantId, @RequestBody String request) throws DecoderException {
+        log.debug("callback参数:" + request + ", merchantId:" + merchantId);
 
         //解析返回串
         JSONObject returnMap = JSON.parseObject(request);
         // 验签
-        if(!SignUtil.validSign(returnMap, key)){
+        if (!SignUtil.validSign(returnMap, key)) {
             throw new AttestationException("验签错误");
-        };
+        }
+        ;
         //获取通信Code
         String returnCode = returnMap.getString("returnCode");
-        if("1".equals(returnCode)){
+        if ("1".equals(returnCode)) {
             //失败
             return errorLog(returnMap);
         }
 
         //获取业务Code
         String resultCode = returnMap.getString("resultCode");
-        if("1".equals(resultCode)){
+        if ("1".equals(resultCode)) {
             //失败
             return errorLog(returnMap);
         }
@@ -62,21 +65,21 @@ public class CallbackController {
         String status = returnMap.getString("status");
         //获取订单号
         String outTradeNo = returnMap.getString("outTradeNo");
-        if("01".equals(status)){
+        if ("01".equals(status)) {
             //目前不需要
-        }else if("02".equals(status)){
+        } else if ("02".equals(status)) {
             applicationEventPublisher.publishEvent(new OrderPaySuccessEvent(outTradeNo));
-        }else if("05".equals(status)){
+        } else if ("05".equals(status)) {
             //目前不需要
-        }else if("09".equals(status)){
+        } else if ("09".equals(status)) {
             applicationEventPublisher.publishEvent(new OrderPayFailedEvent(outTradeNo));
         }
         return "SUCCESS";
     }
 
-    private String errorLog(JSONObject returnMap){
+    private String errorLog(JSONObject returnMap) {
         String errCodeDes = returnMap.getString("errCodeDes");
-        if(errCodeDes != null) {
+        if (errCodeDes != null) {
             log.error(errCodeDes);
         }
         return "FAIL";

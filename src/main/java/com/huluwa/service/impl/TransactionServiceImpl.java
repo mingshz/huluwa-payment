@@ -32,7 +32,7 @@ public class TransactionServiceImpl implements TransactionService {
         this.sendUrl = environment.getProperty("huluwa.transferUrl", "http://pay-wx.join51.com/oft/acquirePlatform/api/transfer.html");
         this.key = environment.getProperty("huluwa.Mkey", "55be454630e847d7815c2c2d3bc59c0d");
         this.mchId = environment.getProperty("huluwa.mchId", "000000010000000001");
-        this.URLPrefix = environment.getProperty("huluwa.URLPrefix","http://dhs.mingshz.com/huluwa");
+        this.URLPrefix = environment.getProperty("huluwa.URLPrefix", "http://dhs.mingshz.com/huluwa");
     }
 
     /**
@@ -41,10 +41,10 @@ public class TransactionServiceImpl implements TransactionService {
      * @param r 需要商户发过来的请求信息
      * @throws IOException
      */
-    public String transaction(RequestMessage r) throws IOException {
+    private String transaction(RequestMessage r) throws IOException {
         BigDecimal amount = r.getAmount();
         double v = amount.doubleValue();
-        if(v < 1.0){
+        if (v < 1.0) {
             throw new PlaceOrderFailedException("请求失败:金额最小1元");
         }
         //商户密钥
@@ -65,7 +65,7 @@ public class TransactionServiceImpl implements TransactionService {
         //交易方式
         transactionEntity.setChannel(r.getChannel());
         //异步回调地址
-        transactionEntity.setNotifyUrl(r.getURLPrefix() + "/huluwa/transfer");
+        transactionEntity.setNotifyUrl(r.getURLPrefix() + "/huluwa/transfer/" + r.getMchId());
 
         //转成json
         String s = objectMapper.writeValueAsString(transactionEntity);
@@ -79,22 +79,22 @@ public class TransactionServiceImpl implements TransactionService {
         map.put("sign", sign);
         //转换成json串
         String postStr = objectMapper.writeValueAsString(map);
-        log.info("发送的请求信息" + postStr);
+        log.debug("发送的请求信息" + postStr);
 
-        String returnStr = HttpsClientUtil.sendRequest(sendUrl, postStr, "application/json");
+        String returnStr = HttpsClientUtil.sendRequest(sendUrl, postStr);
         Map returnMap = objectMapper.readValue(returnStr, Map.class);
 
-        String returnCode = (String)returnMap.get("returnCode");
+        String returnCode = (String) returnMap.get("returnCode");
         if (returnCode.equals("1")) {
-            throw new PlaceOrderFailedException("请求失败:"+returnStr);
+            throw new PlaceOrderFailedException("请求失败:" + returnStr);
         }
-        String resultCode = (String)returnMap.get("resultCode");
+        String resultCode = (String) returnMap.get("resultCode");
         if (resultCode.equals("0")) {
-            String payCode = (String)returnMap.get("payCode");
-            String payCodeWay = (String)returnMap.get("payCodeWay");
-            log.info("支付地址" + payCode);
+            String payCode = (String) returnMap.get("payCode");
+            String payCodeWay = (String) returnMap.get("payCodeWay");
+            log.debug("支付地址" + payCode);
             if ("01".equals(payCodeWay)) {// url
-                return "redirect:" + payCode;
+                return payCode;
             } else if ("02".equals(payCodeWay)) {// 二维码
                 return payCode;
             } else if ("04".equals(payCodeWay)) {// JSON

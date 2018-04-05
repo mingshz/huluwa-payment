@@ -2,7 +2,6 @@ package com.huluwa.service;
 
 
 import com.huluwa.config.PaymentSpringConfig;
-import com.huluwa.model.RequestMessage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = PaymentSpringConfig.class)
@@ -36,33 +38,36 @@ public class TransactionServiceTest {
     @Test
     public void go() throws IOException {
         //写一个下单请求 ,以商户身份
-        RequestMessage rm = new RequestMessage();
-        rm.setAmount(new BigDecimal("100.23"));
-        rm.setBody("测试的商品");
-        rm.setKey("55be454630e847d7815c2c2d3bc59c0d");
-        rm.setMchId("000000010000000001");
-        //随便写的
-        rm.setURLPrefix("http://www.baidu.com");
-        rm.setOutTradeNo("0010");
-        //测试时只接受网关
-        rm.setChannel("gateway");
-        transactionService.transaction(rm);
+//        RequestMessage rm = new RequestMessage();
+//        rm.setAmount(new BigDecimal("100.23"));
+//        rm.setBody("测试的商品");
+//        rm.setKey("55be454630e847d7815c2c2d3bc59c0d");
+//        rm.setMchId("000000010000000001");
+//        //随便写的
+//        rm.setURLPrefix("http://www.baidu.com");
+//        rm.setOutTradeNo("0010");
+//        //测试时只接受网关
+//        rm.setChannel("gateway");
+//        transactionService.transaction(rm);
+        String url = transactionService.htmlPay(UUID.randomUUID().toString(), "测试的商品", new BigDecimal("100.23"));
+        System.out.println(url);
+        assertThat(url).isNotEmpty();
     }
 
-    @Test
-    public void goGoGo() throws IOException {
-        //写一个下单请求 ,以商户身份
-        RequestMessage rm = new RequestMessage();
-        rm.setAmount(new BigDecimal("1"));
-        rm.setBody("测试的商品");
-        rm.setKey("55be454630e847d7815c2c2d3bc59c0d");
-        rm.setMchId("000000010000000001");
-        //随便写的
-        rm.setURLPrefix("http://dhs.mingshz.com/huluwa");
-        rm.setOutTradeNo("0a10s211");
-        //测试时只接受网关
-        rm.setChannel("gateway");
-        String transaction = transactionService.transaction(rm);
-        System.out.println(transaction);
-    }
+//    @Test
+//    public void goGoGo() throws IOException {
+//        //写一个下单请求 ,以商户身份
+//        RequestMessage rm = new RequestMessage();
+//        rm.setAmount(new BigDecimal("1"));
+//        rm.setBody("测试的商品");
+//        rm.setKey("55be454630e847d7815c2c2d3bc59c0d");
+//        rm.setMchId("000000010000000001");
+//        //随便写的
+//        rm.setURLPrefix("http://dhs.mingshz.com/huluwa");
+//        rm.setOutTradeNo("0a10s211");
+//        //测试时只接受网关
+//        rm.setChannel("gateway");
+//        String transaction = transactionService.transaction(rm);
+//        System.out.println(transaction);
+//    }
 }
