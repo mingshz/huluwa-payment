@@ -1,20 +1,25 @@
 package com.huluwa.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huluwa.entity.TransactionEntity;
 import com.huluwa.exception.PlaceOrderFailedException;
+import com.huluwa.exception.RequestDataException;
+import com.huluwa.model.CardType;
+import com.huluwa.model.PayCardInfo;
 import com.huluwa.model.RequestMessage;
 import com.huluwa.service.TransactionService;
 import com.huluwa.util.HttpsClientUtil;
 import com.huluwa.util.SignUtil;
 import lombok.extern.apachecommons.CommonsLog;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Map;
 
 @Service
 @CommonsLog
@@ -25,11 +30,12 @@ public class TransactionServiceImpl implements TransactionService {
     private final String sendUrl;
     private final String key;
     private final String mchId;
+    //回调地址前缀
     private final String URLPrefix;
 
     @Autowired
     public TransactionServiceImpl(Environment environment) {
-        this.sendUrl = environment.getProperty("huluwa.transferUrl", "http://pay-wx.join51.com/oft/acquirePlatform/api/transfer.html");
+        this.sendUrl = environment.getProperty("huluwa.transferUrl", "http://pay-slb-636362782.ap-northeast-2.elb.amazonaws.com:43251/acquire/acquirePlatform/api/transfer.html");
         this.key = environment.getProperty("huluwa.Mkey", "55be454630e847d7815c2c2d3bc59c0d");
         this.mchId = environment.getProperty("huluwa.mchId", "000000010000000001");
         this.URLPrefix = environment.getProperty("huluwa.URLPrefix","http://dhs.mingshz.com/huluwa");
@@ -67,32 +73,42 @@ public class TransactionServiceImpl implements TransactionService {
         //异步回调地址
         transactionEntity.setNotifyUrl(r.getURLPrefix() + "/huluwa/transfer");
 
+        //如果是快捷支付需要银行卡信息
+        if("qpay".equals(r.getChannel())){
+            transactionEntity.setPayCardInfo(r.getPayCardInfo());
+        }
         //转成json
         String s = objectMapper.writeValueAsString(transactionEntity);
         //转成map
-        Map map = objectMapper.readValue(s, Map.class);
-
+        JSONObject reqStr = JSON.parseObject(s);
+        reqStr.put("payCardInfo",objectMapper.writeValueAsString(r.getPayCardInfo()));
         //调用demo中的拼接字符串方法
-        String toSign = SignUtil.createLinkString(map);
+        String toSign = SignUtil.createLinkString(reqStr);
+        String toSign2 = toSign+"&key="+key;
+        System.out.println(toSign2);
         // 生成签名sign
-        String sign = SignUtil.genSign(key, toSign);
-        map.put("sign", sign);
+        String sign = SignUtil.genSign(key, toSign2);
+        reqStr.put("sign", sign);
         //转换成json串
-        String postStr = objectMapper.writeValueAsString(map);
-        log.info("发送的请求信息" + postStr);
+//        String postStr = objectMapper.writeValueAsString(map);
+        String postStr = reqStr.toJSONString();
+        System.out.println("======================"+postStr);
+       // log.info("发送的请求信息" + postStr);
 
         String returnStr = HttpsClientUtil.sendRequest(sendUrl, postStr, "application/json");
-        Map returnMap = objectMapper.readValue(returnStr, Map.class);
+        log.info("返回的响应信息" + returnStr);
+        JSONObject returnMap = JSON.parseObject(returnStr);
+//        Map returnMap = objectMapper.readValue(returnStr, Map.class);
 
-        String returnCode = (String)returnMap.get("returnCode");
+        String returnCode = returnMap.getString("returnCode");
         if (returnCode.equals("1")) {
             throw new PlaceOrderFailedException("请求失败:"+returnStr);
         }
-        String resultCode = (String)returnMap.get("resultCode");
-        if (resultCode.equals("0")) {
-            String payCode = (String)returnMap.get("payCode");
-            String payCodeWay = (String)returnMap.get("payCodeWay");
-            log.info("支付地址" + payCode);
+
+        String resultCode = returnMap.getString("resultCode");
+        if (resultCode == null || resultCode.equals("0")) {
+            String payCode = returnMap.getString("payCode");
+            String payCodeWay = returnMap.getString("payCodeWay");
             if ("01".equals(payCodeWay)) {// url
                 return "redirect:" + payCode;
             } else if ("02".equals(payCodeWay)) {// 二维码
@@ -110,16 +126,52 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
-    @Override
-    public String htmlPay(String outTradeNo, String body, BigDecimal amount) throws PlaceOrderFailedException, IOException {
+    private RequestMessage encapsulation(String outTradeNo, String body, BigDecimal amount,String channel){
         RequestMessage requestMessage = new RequestMessage();
-        requestMessage.setChannel("gateway");
         requestMessage.setOutTradeNo(outTradeNo);
         requestMessage.setBody(body);
         requestMessage.setAmount(amount);
+        requestMessage.setChannel(channel);
         requestMessage.setMchId(mchId);
         requestMessage.setKey(key);
         requestMessage.setURLPrefix(URLPrefix);
+        return requestMessage;
+    }
+
+    @Override
+    public String htmlPay(String outTradeNo, String body, BigDecimal amount) throws PlaceOrderFailedException, IOException {
+        RequestMessage requestMessage = encapsulation(outTradeNo, body, amount, "gateway");
+        return transaction(requestMessage);
+    }
+
+
+
+    @Override
+    public String qpay(String outTradeNo, String body, BigDecimal amount,String cardNo, String customerName, String phoneNo, CardType cardType, String validDate,String cvn2, String cvv2, String idNumber) throws IOException {
+        RequestMessage requestMessage = encapsulation(outTradeNo, body, amount, "qpay");
+
+
+        PayCardInfo payCardInfo = new PayCardInfo();
+        payCardInfo.setBankCardNo(cardNo);
+        payCardInfo.setCustomerName(customerName);
+        payCardInfo.setPhoneNo(phoneNo);
+        if(cardType.equals(CardType.CASH_CARD)){
+            //储蓄卡
+        }else{
+            //信用卡
+            payCardInfo.setValidDate(validDate);
+            if(StringUtils.isNotEmpty(cvn2)){
+                payCardInfo.setCvn2(cvn2);
+            }else if(StringUtils.isNotEmpty(cvv2)){
+                payCardInfo.setCvv2(cvv2);
+            }else{
+                throw new RequestDataException("信用卡信息错误");
+            }
+        }
+        //身份证
+        payCardInfo.setCerType("01");
+        payCardInfo.setCerNo(idNumber);
+        requestMessage.setPayCardInfo(payCardInfo);
         return transaction(requestMessage);
     }
 

@@ -1,5 +1,6 @@
 package com.huluwa.jackson;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huluwa.entity.TransactionEntity;
 import com.huluwa.util.SignUtil;
@@ -7,7 +8,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Map;
 
 public class JacksonTest {
 
@@ -23,7 +23,7 @@ public class JacksonTest {
         System.out.println(s);
 
         String key = "827djez9kejfu7m28ems4jehrek1m";
-        Map<String,String> map = objectMapper.readValue(s, Map.class);
+        JSONObject map = objectMapper.readValue(s, JSONObject.class);
         String toSign = SignUtil.createLinkString(map);
         // 生成签名sign
         String sign = SignUtil.genSign(key, toSign);

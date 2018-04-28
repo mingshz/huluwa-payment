@@ -11,7 +11,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 商户可参考本类编写加密和验签的方法，也可直接使用本类
@@ -68,28 +67,6 @@ public class SignUtil {
         return prestr;
     }
 
-    public static String createLinkString(Map params) {
-        List<String> keys = new ArrayList<String>(params.keySet());
-        Collections.sort(keys);
-        String prestr = "";
-        for (int i = 0; i < keys.size(); i++) {
-            String key = keys.get(i);
-            String value = params.get(key).toString();
-            if (value == null || value.equals("") || key.equalsIgnoreCase("sign")) {
-                continue;
-            }
-            if (i == keys.size() - 1) {// 拼接时，不包括最后一个&字符
-                prestr = prestr + key + "=" + value;
-            } else {
-                prestr = prestr + key + "=" + value + "&";
-            }
-        }
-        if(prestr.endsWith("&")) {
-            prestr = prestr.substring(0 , prestr.length() - 1);
-        }
-        return prestr;
-    }
-
     public static String genSign(String key, String str) {
         String md5sign = md5(str + "&key=" + key).toUpperCase();
         return md5sign;
@@ -105,16 +82,6 @@ public class SignUtil {
 
     public static boolean validSign(JSONObject map, String key) {
         String oldSign = map.getString("sign");
-        String signPlainText = createLinkString(map);
-        String sign = genSign(key, signPlainText);
-        boolean isValid = sign.equals(oldSign);
-        if (!isValid) {
-        }
-        return isValid;
-    }
-
-    public static boolean validSign(Map<String,Object> map, String key){
-        Object oldSign = map.get("sign");
         String signPlainText = createLinkString(map);
         String sign = genSign(key, signPlainText);
         boolean isValid = sign.equals(oldSign);

@@ -1,6 +1,7 @@
 package com.huluwa.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.huluwa.model.PayCardInfo;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -91,7 +92,7 @@ public class TransactionEntity {
      例子：
      {\"bankCardNo\":\"62251222333344\",\"customerName\":\"abcd\",\"phoneNo\":\"13510727311\",\"cerType\":\"01\",\"cerNo\":\"445124199011140321\"",\"validDate\":\"2209\",\"cvn2\":\"4311\"}
      */
-    private String payCardInfo;
+    private PayCardInfo payCardInfo;
     /**
      * 终端类型 1：PC；2：手机
      * 支付类型为gateway时该参数有效；是否必填根据上游通道而定；接入时请与平台确认
@@ -113,4 +114,6 @@ public class TransactionEntity {
      5.gateway
      */
     private String callbackUrl;
+
+
 }

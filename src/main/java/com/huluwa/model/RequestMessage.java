@@ -49,5 +49,9 @@ public class RequestMessage {
      */
     private String URLPrefix;
 
+    /**
+     * 银行卡信息
+     */
+    private PayCardInfo payCardInfo;
 
 }

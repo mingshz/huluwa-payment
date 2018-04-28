@@ -1,6 +1,7 @@
 package com.huluwa.service;
 
 import com.huluwa.exception.PlaceOrderFailedException;
+import com.huluwa.model.CardType;
 import com.huluwa.model.RequestMessage;
 
 import java.io.IOException;
@@ -31,5 +32,18 @@ public interface TransactionService {
      */
     String htmlPay(String outTradeNo,String body,BigDecimal amount) throws PlaceOrderFailedException, IOException;
 
+    /**
+     * 快捷支付
+     * @param cardNo  银行卡号
+     * @param customerName 银行卡姓名
+     * @param phoneNo 预留手机号
+     * @param cardType 卡的类型
+     * @param validDate 信用卡有效期 YYMM
+     * @param cvn2 信用卡 cvn2号 可以为null
+     * @param cvv2 信用卡 cvv2号 可以为null
+     * @param idNumber 身份证号
+     * @return
+     */
+    String qpay(String outTradeNo, String body, BigDecimal amount,String cardNo,String customerName,String phoneNo,CardType cardType,String validDate,String cvn2,String cvv2,String  idNumber) throws IOException;
 
 }
