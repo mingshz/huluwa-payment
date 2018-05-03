@@ -36,9 +36,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     public TransactionServiceImpl(Environment environment) {
         this.sendUrl = environment.getProperty("huluwa.transferUrl", "http://pay-slb-636362782.ap-northeast-2.elb.amazonaws.com:43251/acquire/acquirePlatform/api/transfer.html");
-        this.key = environment.getProperty("huluwa.Mkey", "55be454630e847d7815c2c2d3bc59c0d");
-        this.mchId = environment.getProperty("huluwa.mchId", "000000010000000001");
-        this.URLPrefix = environment.getProperty("huluwa.URLPrefix","http://dhs.mingshz.com/huluwa");
+        this.key = environment.getProperty("huluwa.mKey", "64050e37ffb24b2585d7dd16d77ac423");
+        this.mchId = environment.getProperty("huluwa.mchId", "000000020000000002");
+        this.URLPrefix = environment.getProperty("huluwa.URLPrefix","http://dhs.mingshz.com/huluwa/transfer");
     }
 
     /**
@@ -65,13 +65,13 @@ public class TransactionServiceImpl implements TransactionService {
         //商品描述
         transactionEntity.setBody(r.getBody());
         //金额
-        transactionEntity.setAmount(r.getAmount());
+        transactionEntity.setAmount(r.getAmount().toString());
         //商户方商品id
         transactionEntity.setMchId(r.getMchId());
         //交易方式
         transactionEntity.setChannel(r.getChannel());
         //异步回调地址
-        transactionEntity.setNotifyUrl(r.getURLPrefix() + "/huluwa/transfer");
+        transactionEntity.setNotifyUrl(r.getURLPrefix());
 
         //如果是快捷支付需要银行卡信息
         if("qpay".equals(r.getChannel())){
@@ -81,24 +81,18 @@ public class TransactionServiceImpl implements TransactionService {
         String s = objectMapper.writeValueAsString(transactionEntity);
         //转成map
         JSONObject reqStr = JSON.parseObject(s);
-        reqStr.put("payCardInfo",objectMapper.writeValueAsString(r.getPayCardInfo()));
         //调用demo中的拼接字符串方法
         String toSign = SignUtil.createLinkString(reqStr);
-        String toSign2 = toSign+"&key="+key;
-        System.out.println(toSign2);
         // 生成签名sign
-        String sign = SignUtil.genSign(key, toSign2);
+        String sign = SignUtil.genSign(key, toSign);
         reqStr.put("sign", sign);
         //转换成json串
-//        String postStr = objectMapper.writeValueAsString(map);
         String postStr = reqStr.toJSONString();
-        System.out.println("======================"+postStr);
-       // log.info("发送的请求信息" + postStr);
+        log.info("发送的请求信息" + postStr);
 
-        String returnStr = HttpsClientUtil.sendRequest(sendUrl, postStr, "application/json");
+        String returnStr = HttpsClientUtil.sendRequest(sendUrl, postStr);
         log.info("返回的响应信息" + returnStr);
         JSONObject returnMap = JSON.parseObject(returnStr);
-//        Map returnMap = objectMapper.readValue(returnStr, Map.class);
 
         String returnCode = returnMap.getString("returnCode");
         if (returnCode.equals("1")) {
@@ -149,8 +143,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public String qpay(String outTradeNo, String body, BigDecimal amount,String cardNo, String customerName, String phoneNo, CardType cardType, String validDate,String cvn2, String cvv2, String idNumber) throws IOException {
         RequestMessage requestMessage = encapsulation(outTradeNo, body, amount, "qpay");
-
-
         PayCardInfo payCardInfo = new PayCardInfo();
         payCardInfo.setBankCardNo(cardNo);
         payCardInfo.setCustomerName(customerName);
@@ -162,8 +154,6 @@ public class TransactionServiceImpl implements TransactionService {
             payCardInfo.setValidDate(validDate);
             if(StringUtils.isNotEmpty(cvn2)){
                 payCardInfo.setCvn2(cvn2);
-            }else if(StringUtils.isNotEmpty(cvv2)){
-                payCardInfo.setCvv2(cvv2);
             }else{
                 throw new RequestDataException("信用卡信息错误");
             }
@@ -172,6 +162,12 @@ public class TransactionServiceImpl implements TransactionService {
         payCardInfo.setCerType("01");
         payCardInfo.setCerNo(idNumber);
         requestMessage.setPayCardInfo(payCardInfo);
+        return transaction(requestMessage);
+    }
+
+    @Override
+    public String wxQrPay(String outTradeNo, String body, BigDecimal amount) throws PlaceOrderFailedException, IOException {
+        RequestMessage requestMessage = encapsulation(outTradeNo, body, amount, "wxPubQR");
         return transaction(requestMessage);
     }
 

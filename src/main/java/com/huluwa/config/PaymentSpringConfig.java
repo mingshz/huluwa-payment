@@ -3,6 +3,7 @@ package com.huluwa.config;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * 载入该配置可以获得葫芦娃支付接入功能
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Import;
 @ComponentScan({
         "com.huluwa.service"
 })
+@PropertySource({"classpath:/pay_message.properties"})
 @Import({MvcConfig.class})
 public class PaymentSpringConfig {
 }

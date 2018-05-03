@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.huluwa.model.PayCardInfo;
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 /**
  * 交易接口参数实体
  */
@@ -51,7 +49,7 @@ public class TransactionEntity {
     /**
      * 单位为元，小数两位
      */
-    private BigDecimal amount;
+    private String amount;
 
     /**
      * 订单创建时间，格式为yyyyMMddHHmmss，如2009年12月25日9点10分10秒表示为20091225091010

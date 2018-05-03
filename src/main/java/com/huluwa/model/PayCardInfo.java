@@ -55,8 +55,4 @@ public class PayCardInfo {
      */
     private String cvn2;
 
-    /**
-     * cvn2: 信用卡 cvv2, 信用卡必填写
-     */
-    private String cvv2;
 }

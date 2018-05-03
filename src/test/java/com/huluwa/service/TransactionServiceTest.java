@@ -2,8 +2,8 @@ package com.huluwa.service;
 
 
 import com.huluwa.config.PaymentSpringConfig;
-import com.huluwa.model.PayCardInfo;
 import com.huluwa.model.RequestMessage;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,60 +50,43 @@ public class TransactionServiceTest {
         transactionService.transaction(rm);
     }
 
-    @Test
-    public void goGoGo() throws IOException {
-        //写一个下单请求 ,以商户身份
-        RequestMessage rm = new RequestMessage();
-        rm.setAmount(new BigDecimal("1"));
-        rm.setBody("测试的商品");
-        rm.setKey("55be454630e847d7815c2c2d3bc59c0d");
-        rm.setMchId("000000010000000001");
-        //随便写的
-        rm.setURLPrefix("http://dhs.mingshz.com/huluwa");
-        rm.setOutTradeNo("0a10s211");
-        //测试时只接受网关
-        rm.setChannel("gateway");
-        String transaction = transactionService.transaction(rm);
-        System.out.println(transaction);
-    }
-
-
     /**
-     * 鄂州市灵动网络科技有限公司  测试
+     * 浙江手聚文化创意有限公司  测试
      * 登录网址： http://pay-slb-636362782.ap-northeast-2.elb.amazonaws.com:43251/acquire
-     商户名称： 鄂州市灵动网络科技有限公司
-     商户结算人名称： 鄂州市灵动网络科技有限公司
-     商户号： 000000020000000001
+
+     商户名称： 浙江手聚文化创意有限公司
+
+     商户结算人名称： 浙江手聚文化创意有限公司
+
+     商户号： 000000020000000002
+
      初始密码： 667788
-     商户技术秘钥： e375e8432d044f6ebb691c43c307e682
-     备案手机： 15308684781
-     备案邮箱： 15308684781@163.com
+
+     商户技术秘钥： 64050e37ffb24b2585d7dd16d77ac423
+
+     备案手机： 18023011077
+
+     备案邮箱： shouju778899@sohu.com
+
      注意事项： 请初始登录修改用户密码，谢谢！
      */
     @Test
-    public void ezldTest() throws IOException {
+    public void wxQrTest() throws IOException {
         //写一个下单请求 ,以商户身份
         RequestMessage rm = new RequestMessage();
-        rm.setAmount(new BigDecimal("1"));
+        //范围是10 -  3000元
+        rm.setAmount(new BigDecimal("10"));
         rm.setBody("测试的商品");
         rm.setKey("64050e37ffb24b2585d7dd16d77ac423");
         rm.setMchId("000000020000000002");
         //随便写的
         rm.setURLPrefix("http://www.baidu.com");
-        rm.setOutTradeNo("test2");
+        int i = RandomUtils.nextInt();
+        rm.setOutTradeNo("ms"+i);
         //支付方式
-        rm.setChannel("qpay");
+        rm.setChannel("wxPubQR");
 
-        // 银行卡信息
-        PayCardInfo payCardInfo = new PayCardInfo();
-        payCardInfo.setBankCardNo("6225884519945847");
-        payCardInfo.setCustomerName("李雪峰");
-        payCardInfo.setPhoneNo("18804514144");
-        //证件类型  身份证 01
-        payCardInfo.setCerType("01");
-        payCardInfo.setCerNo("230103199207103655");
-        rm.setPayCardInfo(payCardInfo);
-        String transaction = transactionService.transaction(rm);
+        String transaction = transactionService.wxQrPay("ms"+i, "测试的商品", new BigDecimal("10"));
         System.out.println(transaction);
     }
 

@@ -13,11 +13,15 @@ public class JacksonTest {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * 测试 生成的json字符串是否符合预期
+     * @throws IOException
+     */
     @Test
     public void test1() throws IOException {
         TransactionEntity transactionEntity = new TransactionEntity();
         transactionEntity.setAccessType("测试");
-        transactionEntity.setAmount(new BigDecimal("100.28"));
+        transactionEntity.setAmount(new BigDecimal("100.28").toString());
         transactionEntity.setBody("测试商品");
         String s = objectMapper.writeValueAsString(transactionEntity);
         System.out.println(s);

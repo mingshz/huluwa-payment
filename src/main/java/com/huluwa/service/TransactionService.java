@@ -46,4 +46,14 @@ public interface TransactionService {
      */
     String qpay(String outTradeNo, String body, BigDecimal amount,String cardNo,String customerName,String phoneNo,CardType cardType,String validDate,String cvn2,String cvv2,String  idNumber) throws IOException;
 
+    /**
+     * 微信扫码支付
+     * @param outTradeNo 商户系统内部的订单号,32个字符内、可包含字母, 确保在商户系统唯一
+     * @param body 商品详情
+     * @param amount 金额，单位是元；最多保留两位；不支持一元以下的支付
+     * @return
+     * @throws PlaceOrderFailedException
+     * @throws IOException
+     */
+    String wxQrPay(String outTradeNo,String body,BigDecimal amount) throws PlaceOrderFailedException, IOException;
 }
